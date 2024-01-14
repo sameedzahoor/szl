@@ -1,3 +1,3 @@
-szl is a tiny terminal interface for chatting with llms. It tries to be minimal and not in your face kind of tool. It offers some nice improvements to the user interface for python-tgpt (I plan to support more such CLI tools in the near future) and offers simple chat management. As of today it depends on two main packages in addition to GNU core tools:
+szl is a tiny terminal interface for chatting with llms. It offers some nice improvements to the user interface for python-tgpt (I plan to support more such CLI tools in the near future) and offers simple chat management. As of today it depends on two main packages in addition to GNU core tools:
 1. python-tgpt (See https://github.com/Simatwa/python-tgpt ) [version 0.2.2]
 2. fzf [version 0.44.1]
