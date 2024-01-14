@@ -375,7 +375,6 @@ szl_shell_prompt() {
 
 	# The command prompt
 	shell_input="$(pytgpt generate --shell --quiet --temperature "$temperature" --top-p  "$top_p" --top-k "$top_k" --max-tokens "$max_tokens_sample" --disable-conversation --provider "$current_provider_for_shell" "$text_input" | sed 's/[[:space:]]*$//' | fzf --layout=reverse --height=10% --prompt='> ' --pointer="- " --query="" --info="default" --bind=enter:print-query,tab:accept)"
-	# shell_input="$(tgpt -q -s --provider "$current_provider" "$text_input")" 	
 
 	# Handling default commands
 	eval "$handle_default_commands_shell"
@@ -425,7 +424,7 @@ szl_shell_prompt() {
 				echo -e "${BOLD_RED}Errors were encountered during execution. Aborting.${NO_COLOR}"
 			fi
 			
-			# Unfreeze terminal from fzf to facilitate inspecting output on terminal
+			# Unfreeze terminal from fzf to facilitate inspecting output on terminal and mouse scroll
 			read -s -n 1
 
 			break
