@@ -117,14 +117,14 @@ handle_default_commands_text=$(cat << 'EOF'
 case "$text_input" in
     
 	# Handles pressing <Esc> at the prompt 
-    "")
-        return
-    ;;
+    	"")
+        	return
+    	;;
     
 	# Exit from szl    
-    "exit"|":exit"|":q")
-        exit 0
-    ;;
+    	"exit"|":exit"|":q")
+        	exit 0
+    	;;
 	
 	# Show help menu
 	":help"|"?")
@@ -134,35 +134,35 @@ case "$text_input" in
 	;;
     
 	# Inspect mode for unfreezing fzf to enable mouse scrolling and copying text
-    ":inspect"|":i"|"i")
-        read -s -n 1
-        return
-    ;;
+    	":inspect"|":i"|"i")
+        	read -s -n 1
+        	return
+    	;;
     
 	# Switch to regular mode
-    ":regular"|":r")
-        current_mode="regular"
+    	":regular"|":r")
+        	current_mode="regular"
 		echo -e "${BOLD_CYAN}[] ${NO_COLOR}"
 		echo "Switched to regular mode".		
-        return
+        	return
 	;;
     
 	# Switch to code mode
-    ":code"|":c")
-        current_mode="code"
+    	":code"|":c")
+        	current_mode="code"
 		echo -e "${BOLD_CYAN}[] ${NO_COLOR}"
 		echo "Switched to code mode."		
-        return
-    ;;
+        	return
+    	;;
     
 	# Switch to shell mode
-    ":shell"|":s")
-        current_mode="shell"
+    	":shell"|":s")
+        	current_mode="shell"
 		echo -e "${BOLD_CYAN}[] ${NO_COLOR}"
 		echo "Switched to shell mode. Saving conversations is disabled in this mode." 
 		echo "Default provider for this mode is $current_provider_for_shell."
-        return
-    ;;
+        	return
+    	;;
 	
 	# Delete last question and response in the current chat
 	":delete_last_question"|":dlq")
@@ -271,16 +271,16 @@ case "$text_input" in
 	;;
     
 	# Launch bash within szl
-    ":bash")
-        bash
-        return
-    ;;
+    	":bash")
+        	bash
+        	return
+    	;;
     
 	# Launch zsh within szl
-    ":zsh")
-        zsh
-        return
-    ;;
+    	":zsh")
+        	zsh
+        	return
+    	;;
 	
 	# Switch model provider
 	":provider"|":p")
