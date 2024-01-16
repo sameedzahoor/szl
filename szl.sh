@@ -98,7 +98,7 @@ Inspect Mode (Unfreeze fzf)                                      :inspect | :i |
 Switch to regular chat mode                                          :regular | :r
 Switch to shell mode                                                   :shell | :s
 Switch to code mode                                                     :code | :c
-Delete last question from current selected chat       :delete_last_question | :dlq
+Delete last query from current selected chat          :delete_last_question | :dlq
 Begin new chat                                                           :new | :n
 Switch to existing chat                                        :switch_chat | :swc
 Save current chat                                                            :save
@@ -164,7 +164,7 @@ case "$text_input" in
         	return
     	;;
 	
-	# Delete last question and response in the current chat
+	# Delete last query and response in the current chat
 	":delete_last_question"|":dlq")
 		if [ ! -f "$current_chat_file" ]; then
 			return
@@ -182,6 +182,7 @@ case "$text_input" in
 		selected_chat="$(ls -t $chat_directory | sed 's/\.txt$//' | fzf --layout=reverse --height=10% --prompt='> ' --pointer="- " --info="right" --query="" --bind=enter:accept,tab:accept)"
 		echo -e "${ERASE_LINE}"
 		if [ "$selected_chat" = "" ]; then
+			echo "No chat selected."
 			return
 		fi
 		current_chat_file="$chat_directory/$selected_chat.txt"
@@ -196,10 +197,11 @@ case "$text_input" in
 		selected_chat="$(ls -t $chat_directory | sed 's/\.txt$//' | fzf --layout=reverse --height=10% --prompt='> ' --pointer="- " --info="right" --query="" --bind=enter:accept,tab:accept)"
 		echo -e "${ERASE_LINE}"
 		if [ "$selected_chat" = "" ]; then
+			echo "No chat selected."
 			return
 		fi
 		echo -e "Reading chat named ${BOLD_YELLOW}$selected_chat${NO_COLOR}"
-		printf "$(sed 's/^User :/\\033[1;31m>\\033[0m\n/'  "$chat_directory/$selected_chat.txt" | sed 's/^LLM :/\\033[1;32m><\\033[0m\n/' | sed "1{/You're a Large Language Model for chatting with people. Your role: Provide ONLY response./d;}")" | less
+		printf "$(sed 's/^User :/\\033[1;31m>\\033[0m\n/'  "$chat_directory/$selected_chat.txt" | sed 's/^LLM :/\\033[1;32m><\\033[0m\n/' | sed "1{/You're a Large Language Model for chatting with people. Your role: Provide ONLY response./d;}")" | less -R
 		return	
 	;;
 	
@@ -210,6 +212,7 @@ case "$text_input" in
 		selected_chat="$(ls -t $chat_directory | sed 's/\.txt$//' | fzf --layout=reverse --height=10% --prompt='> ' --pointer="- " --info="right" --query="" --bind=enter:accept,tab:accept)"
 		echo -e "${ERASE_LINE}"
 		if [ "$selected_chat" = "" ]; then
+			echo "Operation cancelled."
 			return
 		elif [ "$selected_chat" = "$current_chat_file" ]; then
 			current_chat_file="$chat_directory/current_chat_file.txt"
@@ -249,6 +252,7 @@ case "$text_input" in
 			if [ -f "$chat_directory/current_chat_file.txt" ]; then
 				rm "$chat_directory/current_chat_file.txt"
 			fi
+			current_chat_file="$chat_directory/current_chat_file.txt"
 			echo "Starting new chat."
 
 		# Handle empty input or cancel
