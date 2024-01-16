@@ -98,7 +98,7 @@ Inspect Mode (Unfreeze fzf)                                      :inspect | :i |
 Switch to regular chat mode                                          :regular | :r
 Switch to shell mode                                                   :shell | :s
 Switch to code mode                                                     :code | :c
-Delete last query from current selected chat          :delete_last_question | :dlq
+Delete last query from current selected chat             :delete_last_query | :dlq
 Begin new chat                                                           :new | :n
 Switch to existing chat                                        :switch_chat | :swc
 Save current chat                                                            :save
@@ -165,7 +165,7 @@ case "$text_input" in
     	;;
 	
 	# Delete last query and response in the current chat
-	":delete_last_question"|":dlq")
+	":delete_last_query"|":dlq")
 		if [ ! -f "$current_chat_file" ]; then
 			return
 		fi
