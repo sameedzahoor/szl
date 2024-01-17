@@ -169,7 +169,8 @@ case "$text_input" in
 		if [ ! -f "$current_chat_file" ]; then
 			return
 		fi
-		sed '/^User :/!b;:a;$!{N;s/\n/&/;ba};s/\(.*User :[^\n]*\).*/\1/' "$current_chat_file" | sed '$d' > "$current_chat_file"
+		sed -i '/^User :/!b;:a;$!{N;s/\n/&/;ba};s/\(.*User :[^\n]*\).*/\1/' "$current_chat_file"
+		sed -i '$d' "$current_chat_file"
 		echo -e "${BOLD_CYAN}[] ${NO_COLOR}"		
 		echo 'Deleted the last question and response in the current selected conversation.'
 		return
