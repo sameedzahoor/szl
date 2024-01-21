@@ -6,6 +6,4 @@ Note: Some users have reported errors running the script with bash on MacOS. Zsh
 So on macOS run as:
 zsh szl.sh
 
-Also, there are some inherent differences in how bsd handles core utilities like sed. The places where there are differences have been mentioned in the script and have been commented out. If you are a macOS user experiencing issues, uncomment the macOS lines and comment out the Linux ones.
-
 Feel free to report bugs and raise issues.
