@@ -55,14 +55,14 @@ fi
 
 # List of available providers
 available_providers=$(cat << 'EOF'
-leo
 fakeopen
 opengpt
+koboldai
 EOF
 )
 
 # Display current provider
-current_provider="leo"
+current_provider="fakeopen"
 current_provider_for_shell="fakeopen"
 
 # Set default szl mode
