@@ -58,11 +58,22 @@ available_providers=$(cat << 'EOF'
 fakeopen
 opengpt
 koboldai
+Aura
+Bing
+ChatgptAi
+ChatgptDemo
+FakeGpt
+GeminiProChat
+Koala
+Liaobots
+Llama2
+Phind
+You
 EOF
 )
 
 # Display current provider
-current_provider="fakeopen"
+current_provider="Aura"
 current_provider_for_shell="fakeopen"
 
 # Set default szl mode
