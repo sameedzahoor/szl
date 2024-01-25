@@ -74,7 +74,7 @@ EOF
 
 # Display current provider
 current_provider="Aura"
-current_provider_for_shell="fakeopen"
+current_provider_for_shell="opengpt"
 
 # Set default szl mode
 current_mode="regular"
