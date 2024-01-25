@@ -184,7 +184,7 @@ case "$text_input" in
 		# sed -i "" "${line_no},\$d" "$current_chat_file"	# For mac users
 		sed -i "${line_no},\$d" "$current_chat_file"	# For linux users
 		echo -e "${BOLD_CYAN}[] ${NO_COLOR}"		
-		echo 'Deleted the last question and response in the current selected conversation.'
+		echo 'Deleted the last query and response in the current selected conversation.'
 		return
 	;;
 	
