@@ -214,7 +214,7 @@ case "$text_input" in
 			return
 		fi
 		echo -e "Reading chat named ${BOLD_YELLOW}$selected_chat${NO_COLOR}"
-		printf "$(sed 's/^User :/\\033[1;31m>\\033[0m\n/'  "$chat_directory/$selected_chat.txt" | sed 's/^LLM :/\\033[1;32m><\\033[0m\n/' | sed "1{/You're a Large Language Model for chatting with people. Your role: Provide ONLY response./d;}")" | less -R
+		printf "$(sed 's/^User :/>\n/'  "$chat_directory/$selected_chat.txt" | sed 's/^LLM :/><\n/' | sed "1{/You're a Large Language Model for chatting with people. Assume role of the LLM and give your response./d;}")" | less
 		return	
 	;;
 	
