@@ -401,13 +401,12 @@ szl_shell_prompt() {
 	shell_input="$(tac "$shell_cmd_history" | awk '!seen[$0]++' | fzf --layout=reverse --height=10% --prompt='> ' --pointer="> " --info="right" --query="$shell_input" --bind=enter:print-query,tab:accept)"
 	echo -e "${ERASE_LINE}"
 
-	echo "$shell_input"
 	# Handling default commands
 	eval "$handle_default_commands_shell"
 
 	# Update text prompt history
 	echo -e "${BOLD_GREEN}>< ${BOLD_RED}> ${NO_COLOR}"
-	echo -e "${BOLD}$shell_input${NO_COLOR}"	
+	echo -e "${BOLD_YELLOW}$shell_input${NO_COLOR}"	
 
 	# Final confirmation for run followed by execution
 	echo -e "${BOLD_CYAN}[] ${NO_COLOR}"
