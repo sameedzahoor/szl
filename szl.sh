@@ -73,7 +73,7 @@ EOF
 )
 
 # Display current provider
-current_provider="ChatgptAi"
+current_provider="FakeGpt"
 current_provider_for_shell="opengpt"
 
 # Set default szl mode
