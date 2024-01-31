@@ -388,7 +388,7 @@ szl_shell_prompt() {
 	echo "$text_input" >> "$shell_prompt_history"
 
 	# Post process the prompt for shell syntax	
-	text_input=$(echo $text_input |  sed 'a\Respond in a single line with ONLY THE CODE (do not put the code in quotation marks). No explanations, formatting, markdown etc. ONLY THE COMMAND. You are allowed to chain commands using semi-colon shell syntax to fit the code in a single line.')
+	text_input=$(echo "$text_input" ;  echo 'Respond in a single line with ONLY THE CODE (do not put the code in quotation marks). No explanations, formatting, markdown etc. ONLY THE COMMAND. You are allowed to chain commands using semi-colon shell syntax to fit the code in a single line.')
 
 	# The command prompt
 	shell_input="$(pytgpt generate --shell --quiet --temperature "$temperature" --top-p  "$top_p" --top-k "$top_k" --max-tokens "$max_tokens_sample" --disable-conversation --provider "$current_provider_for_shell" "$text_input" | sed 's/[[:space:]]*$//' | fzf --layout=reverse --height=10% --prompt='> ' --pointer="- " --query="" --info="default" --bind=enter:print-query,tab:accept)"
