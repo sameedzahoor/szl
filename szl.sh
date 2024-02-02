@@ -414,7 +414,7 @@ szl_regular_prompt() {
 	if [ "$current_mode" = "code" ]; then
 		pytgpt generate $raw_flag --quiet --code --code-theme="$current_code_theme"  --temperature "$temperature" --top-p  "$top_p" --top-k "$top_k" --max-tokens "$max_tokens_sample" --provider "$current_provider" --filepath "$current_chat_file" "$text_input" # For python-tgpt
 	elif [ "$current_mode" = "search" ]; then
-		pytgpt generate $raw_flag --quiet --whole --disable-conversation --code-theme="$current_code_theme"  --temperature "$temperature" --top-p  "$top_p" --top-k "$top_k" --max-tokens "$max_tokens_sample" --provider "$current_provider_for_search"  "$text_input"
+		pytgpt generate $raw_flag --quiet --disable-conversation --code-theme="$current_code_theme"  --temperature "$temperature" --top-p  "$top_p" --top-k "$top_k" --max-tokens "$max_tokens_sample" --provider "$current_provider_for_search"  "$text_input"
 	else	
 		pytgpt generate $raw_flag --quiet --temperature "$temperature" --top-p  "$top_p" --top-k "$top_k" --max-tokens "$max_tokens_sample" --provider "$current_provider" --filepath "$current_chat_file" "$text_input" # For python-tgpt
 	fi
