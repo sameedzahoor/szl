@@ -55,26 +55,57 @@ fi
 
 # List of available providers
 available_providers=$(cat << 'EOF'
-fakeopen
 opengpt
-koboldai
+phind
 Aura
 Bing
+ChatBase
+GeminiProChat
+You
+koboldai
+Llama2
+Liaobots
 ChatgptAi
 ChatgptDemo
 FakeGpt
-GeminiProChat
+Vercel
+PerplexityLabs
+PerplexityAi
+TalkAi
+Theb
+Chatxyz
+GeekGpt
 Koala
-Liaobots
-Llama2
 Phind
-You
+ChatgptNext
+ThebApi
+GPTalk
+Gpt6
+Yqcloud
+GptTalkRu
+OnlineGpt
+FreeChatgpt
+Hashnode
+AItianhuSpace
+DeepInfra
+Bard
+OpenaiChat
+Raycast
+HuggingChat
+MyShell
+Pi
+AiChatOnline
+Poe
+GptChatly
+GptGo
+GptForLove
 EOF
 )
 
 # Display current provider
-current_provider="FakeGpt"
+current_provider="ChatBase"
 current_provider_for_shell="opengpt"
+current_provider_for_search="Bing"
 
 # Set default szl mode
 current_mode="regular"
@@ -109,6 +140,7 @@ Inspect Mode (Unfreeze fzf)                                      :inspect | :i |
 Switch to regular chat mode                                          :regular | :r
 Switch to shell mode                                                   :shell | :s
 Switch to code mode                                                     :code | :c
+Switch to search mode                                                 :search | :f
 Delete last query from current selected chat             :delete_last_query | :dlq
 Begin new chat                                                           :new | :n
 Switch to existing chat                                        :switch_chat | :swc
@@ -117,6 +149,7 @@ Delete existing chat                                           :delete_chat | :d
 Select provider from menu                                           :provider | :p
 Launch bash within szl                                                       :bash
 Launch zsh within szl                                                         :zsh
+Remove duplicates from history                                             :rdhist
 Show help menu                                                           :help | ?
 Toggle raw/prettify text                                        :toggle_raw | :tor
 
@@ -165,7 +198,16 @@ case "$text_input" in
 		echo "Switched to code mode."		
         	return
     	;;
-    
+
+	# Switch to search mode
+    	":search"|":f")
+        	current_mode="search"
+		echo -e "${BOLD_CYAN}[] ${NO_COLOR}"
+		echo "Switched to search mode. Saving conversations is disabled in this mode." 
+		echo "Default provider for this mode is $current_provider_for_search."
+        	return
+    	;;
+
 	# Switch to shell mode
     	":shell"|":s")
         	current_mode="shell"
@@ -181,8 +223,11 @@ case "$text_input" in
 			return
 		fi
 		line_no=$(grep -n "^User :" "$current_chat_file" | tail -n 1 | sed 's/:.*//')
-		# sed -i "" "${line_no},\$d" "$current_chat_file"	# For mac users
-		sed -i "${line_no},\$d" "$current_chat_file"	# For linux users
+		if [ "$uname" = "Darwin" ]; then
+			sed -i "" "${line_no},\$d" "$current_chat_file"	# For mac users
+		else
+			sed -i "${line_no},\$d" "$current_chat_file"	# For linux users
+		fi
 		echo -e "${BOLD_CYAN}[] ${NO_COLOR}"		
 		echo 'Deleted the last query and response in the current selected conversation.'
 		return
@@ -298,6 +343,19 @@ case "$text_input" in
         	zsh
         	return
     	;;
+
+	# Remove duplicates from history files
+	":rdhist")
+		cp "$regular_prompt_history" "$regular_prompt_history"_backup
+		cp "$shell_prompt_history" "$shell_prompt_history"_backup
+		cp "$shell_cmd_history" "$shell_cmd_history"_backup
+		tac "$regular_prompt_history"_backup | awk '!seen[$0]++' | tac > "$regular_prompt_history"
+		tac "$shell_prompt_history"_backup | awk '!seen[$0]++' | tac > "$shell_prompt_history"
+		tac "$shell_cmd_history"_backup | awk '!seen[$0]++' | tac > "$shell_cmd_history"
+		echo -e "${BOLD_CYAN}[] ${NO_COLOR}"
+		echo "Removed duplicates from history files."
+		return
+	;;
 	
 	# Switch model provider
 	":provider"|":p")
@@ -355,6 +413,8 @@ szl_regular_prompt() {
 
 	if [ "$current_mode" = "code" ]; then
 		pytgpt generate $raw_flag --quiet --code --code-theme="$current_code_theme"  --temperature "$temperature" --top-p  "$top_p" --top-k "$top_k" --max-tokens "$max_tokens_sample" --provider "$current_provider" --filepath "$current_chat_file" "$text_input" # For python-tgpt
+	elif [ "$current_mode" = "search" ]; then
+		pytgpt generate $raw_flag --quiet --whole --disable-conversation --code-theme="$current_code_theme"  --temperature "$temperature" --top-p  "$top_p" --top-k "$top_k" --max-tokens "$max_tokens_sample" --provider "$current_provider_for_search"  "$text_input"
 	else	
 		pytgpt generate $raw_flag --quiet --temperature "$temperature" --top-p  "$top_p" --top-k "$top_k" --max-tokens "$max_tokens_sample" --provider "$current_provider" --filepath "$current_chat_file" "$text_input" # For python-tgpt
 	fi
@@ -388,7 +448,8 @@ szl_shell_prompt() {
 	echo "$text_input" >> "$shell_prompt_history"
 
 	# Post process the prompt for shell syntax	
-	text_input=$(echo "$text_input" ;  echo 'Respond in a single line with ONLY THE CODE (do not put the code in quotation marks). No explanations, formatting, markdown etc. ONLY THE COMMAND. You are allowed to chain commands using semi-colon shell syntax to fit the code in a single line.')
+	# text_input=$(echo $text_input |  sed 'a\Respond in a single line with ONLY THE CODE (do not put the code in quotation marks). No explanations, formatting, markdown etc. ONLY THE COMMAND. You are allowed to chain commands using semi-colon shell syntax to fit the code in a single line.') # For linux
+	text_input=$(echo "$text_input" ;  echo "Respond in a single line with ONLY THE CODE (do not put the code in quotation marks). No explanations, formatting, markdown etc. ONLY THE COMMAND. You are allowed to chain commands using semi-colon shell syntax to fit the code in a single line.") # For macOS
 
 	# The command prompt
 	shell_input="$(pytgpt generate --shell --quiet --temperature "$temperature" --top-p  "$top_p" --top-k "$top_k" --max-tokens "$max_tokens_sample" --disable-conversation --provider "$current_provider_for_shell" "$text_input" | sed 's/[[:space:]]*$//' | fzf --layout=reverse --height=10% --prompt='> ' --pointer="- " --query="" --info="default" --bind=enter:print-query,tab:accept)"
