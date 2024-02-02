@@ -223,7 +223,7 @@ case "$text_input" in
 			return
 		fi
 		line_no=$(grep -n "^User :" "$current_chat_file" | tail -n 1 | sed 's/:.*//')
-		if [ "$uname" = "Darwin" ]; then
+		if [ "$(uname)" = "Darwin" ]; then
 			sed -i "" "${line_no},\$d" "$current_chat_file"	# For mac users
 		else
 			sed -i "${line_no},\$d" "$current_chat_file"	# For linux users
