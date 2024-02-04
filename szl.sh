@@ -39,6 +39,11 @@ if [ ! -f "$shell_cmd_history" ]; then
 	# echo -e "${BOLD_YELLOW}Creating history file for commands at $shell_cmd_history${NO_COLOR}"
 	touch "$shell_cmd_history"
 fi
+last_search_query="$default_directory/last_search_query"
+if [ ! -f "$shell_cmd_history" ]; then
+	# echo -e "${BOLD_YELLOW}Creating temporary file for search at $last_search_query${NO_COLOR}"
+	touch "$last_search_query"
+fi
 
 chat_directory=$default_directory/chats
 if [ ! -d "$chat_directory" ]; then
@@ -56,11 +61,12 @@ fi
 # List of available providers
 available_providers=$(cat << 'EOF'
 opengpt
-phind
 Aura
 Bing
 ChatBase
 GeminiProChat
+Koala
+phind
 You
 koboldai
 Llama2
@@ -75,7 +81,6 @@ TalkAi
 Theb
 Chatxyz
 GeekGpt
-Koala
 Phind
 ChatgptNext
 ThebApi
@@ -103,9 +108,9 @@ EOF
 )
 
 # Display current provider
-current_provider="ChatBase"
+current_provider="Aura"
 current_provider_for_shell="opengpt"
-current_provider_for_search="Bing"
+current_provider_for_search="phind"
 
 # Set default szl mode
 current_mode="regular"
@@ -141,6 +146,7 @@ Switch to regular chat mode                                          :regular | 
 Switch to shell mode                                                   :shell | :s
 Switch to code mode                                                     :code | :c
 Switch to search mode                                                 :search | :f
+Check the last search results                                     :results | :sres
 Delete last query from current selected chat             :delete_last_query | :dlq
 Begin new chat                                                           :new | :n
 Switch to existing chat                                        :switch_chat | :swc
@@ -207,6 +213,14 @@ case "$text_input" in
 		echo "Default provider for this mode is $current_provider_for_search."
         	return
     	;;
+
+	# Check the last search results
+	":results"|":sres")
+		echo -e "${BOLD_CYAN}[] ${NO_COLOR}"
+		echo "Going through results for the last search."
+		less "$last_search_query"
+		return
+	;;	
 
 	# Switch to shell mode
     	":shell"|":s")
@@ -413,8 +427,11 @@ szl_regular_prompt() {
 
 	if [ "$current_mode" = "code" ]; then
 		pytgpt generate $raw_flag --quiet --code --code-theme="$current_code_theme"  --temperature "$temperature" --top-p  "$top_p" --top-k "$top_k" --max-tokens "$max_tokens_sample" --provider "$current_provider" --filepath "$current_chat_file" "$text_input" # For python-tgpt
-	elif [ "$current_mode" = "search" ]; then
-		pytgpt generate $raw_flag --quiet --disable-conversation --code-theme="$current_code_theme"  --temperature "$temperature" --top-p  "$top_p" --top-k "$top_k" --max-tokens "$max_tokens_sample" --provider "$current_provider_for_search"  "$text_input"
+	elif [ "$current_mode" = "search" ]; then		
+		pytgpt generate $raw_flag --quiet --whole --disable-conversation --code-theme="$current_code_theme"  --temperature "$temperature" --top-p  "$top_p" --top-k "$top_k" --max-tokens "$max_tokens_sample" --provider "$current_provider_for_search"  "$text_input" > $last_search_query
+		line_no=$(cat "$last_search_query" | grep -n "  url:" | tail -n 1 | sed 's/:.*//')
+		cat "$last_search_query" | sed "1,${line_no}d" | sed "s/^http.*//"
+
 	else	
 		pytgpt generate $raw_flag --quiet --temperature "$temperature" --top-p  "$top_p" --top-k "$top_k" --max-tokens "$max_tokens_sample" --provider "$current_provider" --filepath "$current_chat_file" "$text_input" # For python-tgpt
 	fi
