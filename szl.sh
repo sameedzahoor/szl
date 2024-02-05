@@ -429,9 +429,9 @@ szl_regular_prompt() {
 		pytgpt generate $raw_flag --quiet --code --code-theme="$current_code_theme"  --temperature "$temperature" --top-p  "$top_p" --top-k "$top_k" --max-tokens "$max_tokens_sample" --provider "$current_provider" --filepath "$current_chat_file" "$text_input" # For python-tgpt
 	elif [ "$current_mode" = "search" ]; then		
 		pytgpt generate $raw_flag --quiet --whole --disable-conversation --code-theme="$current_code_theme"  --temperature "$temperature" --top-p  "$top_p" --top-k "$top_k" --max-tokens "$max_tokens_sample" --provider "$current_provider_for_search"  "$text_input" > $last_search_query
-		line_no=$(cat "$last_search_query" | grep -n "  url:" | tail -n 1 | sed 's/:.*//')
-		cat "$last_search_query" | sed "1,${line_no}d" | sed "s/^http.*//"
-
+		line_no=$(cat "$last_search_query" | grep -n ".*http" | tail -n 1 | sed 's/:.*//')
+		line_no=$((line_no - 1))
+		cat "$last_search_query"  | sed "1,${line_no}d" | sed 's/^.*http/http/' | awk 'NR==1 {$1=""; print substr($0,2)} NR!=1'
 	else	
 		pytgpt generate $raw_flag --quiet --temperature "$temperature" --top-p  "$top_p" --top-k "$top_k" --max-tokens "$max_tokens_sample" --provider "$current_provider" --filepath "$current_chat_file" "$text_input" # For python-tgpt
 	fi
@@ -465,7 +465,6 @@ szl_shell_prompt() {
 	echo "$text_input" >> "$shell_prompt_history"
 
 	# Post process the prompt for shell syntax	
-	# text_input=$(echo $text_input |  sed 'a\Respond in a single line with ONLY THE CODE (do not put the code in quotation marks). No explanations, formatting, markdown etc. ONLY THE COMMAND. You are allowed to chain commands using semi-colon shell syntax to fit the code in a single line.') # For linux
 	text_input=$(echo "$text_input" ;  echo "Respond in a single line with ONLY THE CODE (do not put the code in quotation marks). No explanations, formatting, markdown etc. ONLY THE COMMAND. You are allowed to chain commands using semi-colon shell syntax to fit the code in a single line.") # For macOS
 
 	# The command prompt
