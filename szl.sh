@@ -492,11 +492,11 @@ szl_shell_prompt() {
 	echo -e "${BOLD_CYAN}Execute?${NO_COLOR}"
 	while true; do
 		if [ -n "$ZSH_VERSION" ]; then
-    		# Running in Zsh
-    		read -r -s -k 1 key
+    			# Running in Zsh
+    			read -r -s -k 1 key
 		else
-    		# Running in Bash
-    		read -r -s -n 1 key
+    			# Running in Bash
+    			read -r -s -n 1 key
 		fi
 
 		# Check for escape key
