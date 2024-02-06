@@ -210,7 +210,6 @@ case "$text_input" in
         	current_mode="search"
 		echo -e "${BOLD_CYAN}[] ${NO_COLOR}"
 		echo "Switched to search mode. Saving conversations is disabled in this mode." 
-		# echo "Default provider for this mode is $current_provider_for_search."
         	return
     	;;
 
