@@ -466,7 +466,6 @@ szl_shell_prompt() {
 	echo "$text_input" >> "$shell_prompt_history"
 
 	# Post process the prompt for shell syntax	
-	# text_input=$(echo $text_input |  sed 'a\Respond in a single line with ONLY THE CODE (do not put the code in quotation marks). No explanations, formatting, markdown etc. ONLY THE COMMAND. You are allowed to chain commands using semi-colon shell syntax to fit the code in a single line.') # For linux
 	text_input=$(echo "$text_input" ;  echo "Respond in a single line with ONLY THE CODE (do not put the code in quotation marks). No explanations, formatting, markdown etc. ONLY THE COMMAND. You are allowed to chain commands using semi-colon shell syntax to fit the code in a single line.") # For macOS
 
 	# The command prompt
