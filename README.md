@@ -2,5 +2,5 @@ Szl is a tiny terminal interface for chatting with llms for linux / macOS. It of
 1. python-tgpt (See https://github.com/Simatwa/python-tgpt ) [version 0.3.2]
 2. fzf [version 0.44.1]
 3. coreutils
-
+Run using `zsh szl.sh`
 Feel free to report bugs and raise issues.
