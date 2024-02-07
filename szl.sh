@@ -61,6 +61,8 @@ fi
 # List of available providers
 available_providers=$(cat << 'EOF'
 opengpt
+llama2
+blackboxai
 Aura
 Bing
 ChatBase
@@ -238,8 +240,10 @@ case "$text_input" in
 		line_no=$(grep -n "^User :" "$current_chat_file" | tail -n 1 | sed 's/:.*//')
 		if [ "$(uname)" = "Darwin" ]; then
 			sed -i "" "${line_no},\$d" "$current_chat_file"	# For mac users
+			sed -i '' '/^$/d' "$current_chat_file"
 		else
 			sed -i "${line_no},\$d" "$current_chat_file"	# For linux users
+			sed -i '/^$/d' "$current_chat_file"
 		fi
 		echo -e "${BOLD_CYAN}[] ${NO_COLOR}"		
 		echo 'Deleted the last query and response in the current selected conversation.'
@@ -431,7 +435,7 @@ szl_regular_prompt() {
 		
   		line_no=$(cat "$last_search_query" | grep -n ".*http" | tail -n 1 | sed 's/:.*//')
 		line_no=$((line_no - 1))
-  		cat "$last_search_query"  | sed "1,${line_no}d" | sed 's/^.*http/http/' | awk 'NR==1 {$1=""; print substr($0,2)} NR!=1'
+  		cat "$last_search_query"  | sed "1,${line_no}d" | sed 's/^.*http/http/' | awk 'NR==1 {$1=""; print substr($0,2)} NR!=1'		
 	else	
 		pytgpt generate $raw_flag --quiet --temperature "$temperature" --top-p  "$top_p" --top-k "$top_k" --max-tokens "$max_tokens_sample" --provider "$current_provider" --filepath "$current_chat_file" "$text_input" # For python-tgpt
 	fi
