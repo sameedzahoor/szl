@@ -44,6 +44,11 @@ if [ ! -f "$shell_cmd_history" ]; then
 	# echo -e "${BOLD_YELLOW}Creating temporary file for search at $last_search_query${NO_COLOR}"
 	touch "$last_search_query"
 fi
+last_rawdog_execution="$default_directory/last_rawdog_execution.txt"
+if [ ! -f "$last_rawdog_execution" ]; then
+	# echo -e "${BOLD_YELLOW}Creating temporary file for search at $last_search_query${NO_COLOR}"
+	touch "$last_rawdog_execution"
+fi
 
 chat_directory=$default_directory/chats
 if [ ! -d "$chat_directory" ]; then
@@ -119,7 +124,7 @@ current_mode="regular"
 
 # Set code theme
 current_code_theme="monokai"
-raw_flag="--raw"
+raw_flag="--prettify"
 
 # Default llm settings
 max_tokens_sample=600
@@ -147,6 +152,7 @@ Inspect Mode (Unfreeze fzf)                                      :inspect | :i |
 Switch to regular chat mode                                          :regular | :r
 Switch to shell mode                                                   :shell | :s
 Switch to code mode                                                     :code | :c
+Switch to rawdog mode                                                      :rawdog
 Switch to search mode                                                 :search | :f
 Check the last search results                                     :results | :sres
 Delete last query from current selected chat             :delete_last_query | :dlq
@@ -204,6 +210,14 @@ case "$text_input" in
         	current_mode="code"
 		echo -e "${BOLD_CYAN}[] ${NO_COLOR}"
 		echo "Switched to code mode."		
+        	return
+    	;;
+
+	# Switch to rawdog mode
+    	":rawdog")
+        	current_mode="rawdog"
+		echo -e "${BOLD_CYAN}[] ${NO_COLOR}"
+		echo "Switched to rawdog mode."		
         	return
     	;;
 
@@ -430,15 +444,55 @@ szl_regular_prompt() {
 
 	if [ "$current_mode" = "code" ]; then
 		pytgpt generate $raw_flag --quiet --code --code-theme="$current_code_theme"  --temperature "$temperature" --top-p  "$top_p" --top-k "$top_k" --max-tokens "$max_tokens_sample" --provider "$current_provider" --filepath "$current_chat_file" "$text_input" # For python-tgpt
+	elif [ "$current_mode" = "rawdog" ]; then
+		pytgpt generate $raw_flag --rawdog --confirm-script --code-theme="$current_code_theme"  --temperature "$temperature" --top-p  "$top_p" --top-k "$top_k" --max-tokens "$max_tokens_sample" --provider "$current_provider" --filepath "$last_rawdog_execution" "$text_input" # For python-tgpt		
 	elif [ "$current_mode" = "search" ]; then		
 		pytgpt generate $raw_flag --quiet --whole --disable-conversation --code-theme="$current_code_theme"  --temperature "$temperature" --top-p  "$top_p" --top-k "$top_k" --max-tokens "$max_tokens_sample" --provider "$current_provider_for_search"  "$text_input" > $last_search_query
 		
   		line_no=$(cat "$last_search_query" | grep -n ".*http" | tail -n 1 | sed 's/:.*//')
 		line_no=$((line_no - 1))
-  		cat "$last_search_query"  | sed "1,${line_no}d" | sed 's/^.*http/http/' | awk 'NR==1 {$1=""; print substr($0,2)} NR!=1'		
+  		cat "$last_search_query"  | sed "1,${line_no}d" | sed 's/^.*http/http/' | awk 'NR==1 {$1=""; print substr($0,2)} NR!=1'
+		
 	else	
 		pytgpt generate $raw_flag --quiet --temperature "$temperature" --top-p  "$top_p" --top-k "$top_k" --max-tokens "$max_tokens_sample" --provider "$current_provider" --filepath "$current_chat_file" "$text_input" # For python-tgpt
 	fi
+	
+	# Unfreeze terminal from fzf to inspect output and mouse scroll
+	read -s -n 1
+
+	return
+}
+
+# The szl rawdog prompt
+szl_rawdog_prompt() {
+
+	# The text prompt.
+	text_input="$(tac $shell_prompt_history | awk '!seen[$0]++' | fzf --layout=reverse --height=10% --pointer="- " --info="right" --query="" --bind=enter:print-query,tab:accept)"
+	
+	# Handling default commands
+	eval "$handle_default_commands_text"
+
+	# Confirmation dialog for text prompt
+	echo -e "${BOLD_YELLOW}Confirm prompt:${NO_COLOR}${CANCEL_NEWLINE}"
+	text_input="$(echo "" | fzf --layout=reverse --height=10% --pointer="- " --info="right" --query="$text_input" --bind=enter:print-query)"
+	echo -e "${ERASE_LINE}"
+
+	# Handling default commands
+	eval "$handle_default_commands_text"
+
+	# Print output and update text prompt history
+	echo -e "${BOLD_RED}> ${NO_COLOR}"
+	echo -e "${BOLD}$text_input${NO_COLOR}"
+	echo "$text_input" >> "$shell_prompt_history"
+
+	# Generate response
+	echo -e "${BOLD_GREEN}>< ${NO_COLOR}"
+	
+	if [ -f "$last_rawdog_execution" ]; then
+		rm "$last_rawdog_execution"
+	fi
+	
+	pytgpt generate $raw_flag --rawdog --confirm-script --code-theme="$current_code_theme"  --temperature "$temperature" --top-p  "$top_p" --top-k "$top_k" --max-tokens "$max_tokens_sample" --provider "$current_provider" --filepath "$last_rawdog_execution" "$text_input" # For python-tgpt
 	
 	# Unfreeze terminal from fzf to inspect output and mouse scroll
 	read -s -n 1
@@ -604,6 +658,8 @@ echo "The current provider for the LLM is $current_provider."
 while true; do
 	if [ "$current_mode" = "shell" ]; then
 		szl_shell_prompt
+	elif [ "$current_mode" = "rawdog" ]; then
+		szl_rawdog_prompt	
 	else
 		szl_regular_prompt
 	fi
