@@ -115,7 +115,7 @@ EOF
 )
 
 # Display current provider
-current_provider="Aura"
+current_provider="Bing"
 current_provider_for_shell="opengpt"
 current_provider_for_search="phind"
 
