@@ -6,3 +6,5 @@ Szl is a tiny terminal interface for chatting with llms for linux / macOS. It of
 Run using `zsh szl.sh`.
 
 Feel free to report bugs and raise issues.
+
+For a demo checkout https://www.youtube.com/watch?v=WoHnOJw7fuc
